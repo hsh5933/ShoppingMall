@@ -1,6 +1,7 @@
 package com.shop.shop.entity;
 
 import com.shop.shop.constant.ItemSellStatus;
+import com.shop.shop.dto.ItemFormDto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -40,5 +41,13 @@ public class Item extends BaseEntity{
 //    private LocalDateTime regTime; //상품 등록시간
 //
 //    private LocalDateTime updateTime; //상품 수정시간
+
+    public void updateItem(ItemFormDto itemFormDto){
+        this.itemNm = itemFormDto.getItemNm();
+        this.price = itemFormDto.getPrice();
+        this.stockNumber = itemFormDto.getStockNumber();
+        this.itemDetail = itemFormDto.getItemDetail();
+        this.itemSellStatus = itemFormDto.getItemSellStatus();
+    }
 
 }

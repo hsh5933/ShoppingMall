@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,10 +33,32 @@ public class ItemImgService {
             imgName = fileService.uploadFile(itemImgLocation,oriImgName,itemImgFile.getBytes());
             imgUrl = "/images/item/"+imgName;
         }
-
+//        상품 이미지 정보 저장
+//        imgName : 실제 로컬에 저장된 상품 이미지 파일 이름
+//        oriImgName : 업로드했던 상품 이미지 파일의 원래 이름
+//        imgUrl : 업로드 결과 로컬에 저장된 상품 이미지 파일을 불러오는 경로
         //상품 이미지 정보 저장
         itemImg.updateItemImg(oriImgName,imgName,imgUrl);
         itemImgRepository.save(itemImg);
+    }
+
+    public void updateItemImg(Long itemImgId,MultipartFile itemImgFile)throws Exception{
+        //상품등록 사진이 존재한다면 상품이미지 아이디를 이용하여 저장한 상품이미지 엔티티 조회
+        if(!itemImgFile.isEmpty()){
+            ItemImg savedItemImg = itemImgRepository.findById(itemImgId)
+                    .orElseThrow(EntityNotFoundException::new);
+
+            //기존이미지 파일 삭제
+            if(!StringUtils.isEmpty(savedItemImg.getImgName())){
+                fileService.deleteFile(itemImgLocation+"/"+savedItemImg.getImgName());
+            }
+
+            String oriImgName = itemImgFile.getOriginalFilename();
+            String imgName=fileService.uploadFile(itemImgLocation,oriImgName,itemImgFile.getBytes());
+            String imgUrl = "/images/item/"+imgName;
+            savedItemImg.updateItemImg(oriImgName,imgName,imgUrl);
+        }
+
     }
 
 
